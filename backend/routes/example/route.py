@@ -1,9 +1,22 @@
-from backend.app import app
+from flask import request
+from backend.app import app, db
+from backend.models import TestModel
 
 
-@app.route("/<req_id>", methods=["GET"])
-def example(req_id):
-    if req_id == "id":
-        return {"status": 200, "message": "You are on a good way!"}
-    else:
-        return {"status": 400, "message": "You are on a bad way!"}, 400
+@app.route("/model", methods=["GET", "POST"])
+def example():
+    if request.method == "POST":
+        if request.is_json:
+            data = request.get_json()
+            new_model = TestModel(data)
+
+            db.session.add(new_model)
+            db.session.commit()
+
+            return {"message": f"Created {new_model.name} with id {new_model.id}"}
+        else:
+            return {"message": "Invalid json!"}, 400
+    elif request.method == "GET":
+        models = TestModel.query.all()
+
+        return {"items": models}

@@ -1,2 +1,2 @@
-import backend.routes.index.route
-import backend.routes.example.route
+from backend.routes.index.route import index
+from backend.routes.example.route import example
