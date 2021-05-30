@@ -1,0 +1,44 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:import/typescript"
+  ],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".js", ".jsx", ".ts", ".tsx"
+      ]
+    }
+  },
+  "plugins": ["jest"],
+  "env": {
+    "jest/globals": true,
+    "browser": true
+  },
+  "rules": {
+    "import/no-unresolved": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-use-before-define": "off",
+    "no-unused-vars": "off",
+    "consistent-return": "off",
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "@typescript-eslint/no-unused-vars": ["warn", { "ignoreRestSiblings": true }],
+    "@typescript-eslint/no-use-before-define": "warn",
+    "import/extensions": ["warn", "never"],
+    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx", ".tsx"] }],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "import/prefer-default-export": "off",
+    "react/jsx-props-no-spreading": "off",
+    "no-shadow": "off",
+    "no-param-reassign": ["error", { "props": false }],
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/display-name": "off",
+    "linebreak-style": 0,
+    "import/no-cycle": "warn"
+  }
+}
