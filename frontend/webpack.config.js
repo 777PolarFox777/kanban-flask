@@ -65,6 +65,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      publicPath: '/',
       title: 'Kanban Flask app',
       template: path.resolve(__dirname, './public/index.html'), // шаблон
       filename: 'index.html', // название выходного файла
