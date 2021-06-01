@@ -1,2 +1,3 @@
-from backend.routes.index.route import index
-from backend.routes.example.route import example
+import backend.routes.index.route
+import backend.routes.column.route
+import backend.routes.error_handlers.route
