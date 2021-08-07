@@ -5,7 +5,8 @@
     "airbnb",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "plugin:css-import-order/recommended"
   ],
   "settings": {
     "import/parsers": {
@@ -14,12 +15,13 @@
       ]
     }
   },
-  "plugins": ["jest"],
+  "plugins": ["jest", "css-import-order"],
   "env": {
     "jest/globals": true,
     "browser": true
   },
   "rules": {
+    "import/order": "error",
     "import/no-unresolved": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "no-use-before-define": "off",

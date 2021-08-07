@@ -40,12 +40,12 @@ module.exports = {
         ],
         exclude: /node_modules/,
       },
-      // изображения
+      // images
       {
         test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
         type: 'asset/resource',
       },
-      // шрифты и SVG
+      // fonts and SVG
       {
         test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
         type: 'asset/inline',
@@ -62,6 +62,13 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      '@utils': path.resolve(__dirname, 'src/utils/'),
+      '@components': path.resolve(__dirname, 'src/components/'),
+      '@pages': path.resolve(__dirname, 'src/pages/'),
+      '@store': path.resolve(__dirname, 'src/store/'),
+      '@constants': path.resolve(__dirname, 'src/constants/'),
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -83,9 +90,15 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
-    contentBase: path.join(__dirname, './public'),
+    contentBase: [path.join(__dirname, './public'), path.join(__dirname, './tailwind.config.js')],
     compress: true,
     hot: true,
     port: 9000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        pathRewrite: { '^/api': '' },
+      },
+    },
   },
 };

@@ -1,16 +1,14 @@
-import * as React from 'react';
+import React from 'react';
+import { Kanban } from '@pages';
+import { Header } from '@components/Header';
 
-export const App = () => {
-  const [count, setCount] = React.useState(0);
-  return (
-    <div>
-      <h1>
-        Count:
-        {count}
-      </h1>
-      <button type="button" onClick={() => setCount(count + 1)}>Increase!</button>
-    </div>
-  );
-};
+import './App.css';
+
+export const App = () => (
+  <div className="font-sans flex flex-col h-full">
+    <Header />
+    <Kanban />
+  </div>
+);
 
 App.displayName = 'App';

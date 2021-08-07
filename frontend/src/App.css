@@ -1,0 +1,18 @@
+@tailwind base; /* Preflight will be injected here */
+
+@tailwind components;
+
+@tailwind utilities;
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    @apply h-full;
+    background-color: theme('colors.gray.200');
+}
+
+#root {
+    @apply h-full;
+}

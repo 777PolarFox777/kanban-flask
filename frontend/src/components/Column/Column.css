@@ -1,0 +1,5 @@
+.column {
+    &-content {
+        min-height: 60vh;
+    }
+}

@@ -20,12 +20,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "typeRoots": [
-      "./node_modules/@types",
-      "./types"
+      "./types",
+      "./node_modules/@types"
     ],
     "baseUrl": "./",
     "paths": {
       "@utils": ["./src/utils"],
+      "@utils/*": ["./src/utils/*"],
       "@components": ["./src/components"],
       "@components/*": ["./src/components/*"],
       "@pages": ["./src/pages"],

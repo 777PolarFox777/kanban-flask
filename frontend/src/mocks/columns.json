@@ -1,0 +1,23 @@
+[
+  {
+    "color": "#34bdeb",
+    "id": 1,
+    "order": 1,
+    "title": "Todo",
+    "userId": 1
+  },
+  {
+    "color": "#f7d760",
+    "id": 2,
+    "order": 2,
+    "title": "In progress",
+    "userId": 1
+  },
+  {
+    "color": "#60f7ac",
+    "id": 3,
+    "order": 3,
+    "title": "Done",
+    "userId": 1
+  }
+]

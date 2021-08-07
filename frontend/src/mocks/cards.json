@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "order": 1,
+    "text": "Example card 1",
+    "columnId": 1
+  },
+  {
+    "id": 2,
+    "order": 2,
+    "text": "Example card 2",
+    "columnId": 1
+  },
+  {
+    "id": 3,
+    "order": 1,
+    "text": "Example card 3",
+    "columnId": 2
+  }
+]
