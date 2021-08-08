@@ -7,6 +7,8 @@ const errorHandler = (err: AxiosError | Error) => {
   } else {
     console.error(err);
   }
+
+  throw err;
 };
 
 const get = <T = any>(url: string, config?: AxiosRequestConfig) => axios

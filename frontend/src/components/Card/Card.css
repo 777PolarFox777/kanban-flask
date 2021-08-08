@@ -1,0 +1,11 @@
+.card {
+    min-width: 6rem;
+    max-width: 9rem;
+    min-height: 6rem;
+    cursor: grab;
+
+    &-content:hover {
+        cursor: text;
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+}

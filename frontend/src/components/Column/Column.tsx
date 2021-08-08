@@ -1,21 +1,35 @@
 import * as React from 'react';
 import cn from 'classnames';
+import { Card } from '@components/Card';
+import mockCards from '../../mocks/cards.json';
 
 import './Column.css';
 
 export interface ColumnProps {
-  className?: string,
+  color?: string,
   title?: string,
 }
 
 export const Column = (props: ColumnProps) => {
-  const { className, title } = props;
+  const { color: backgroundColor, title } = props;
+
+  // use #rrggbbaa hex format
+  const transparentizedColor = `${backgroundColor}64`;
+
   return (
-    <div className="flex-grow">
-      <div className={cn(className, 'p-md mb-xsm text-white text-2xl text-center font-semibold')}>
+    <div className="w-full">
+      <div style={{ backgroundColor }} className="p-md mb-xsm text-white text-2xl text-center font-semibold">
         {title}
       </div>
-      <div className={cn(className, 'opacity-25 h-full', 'column-content')} />
+      <div style={{ backgroundColor: transparentizedColor }} className="h-full column-content p-md">
+        <div className="flex flex-wrap gap-md items-start">
+          {mockCards.map((card) => (
+            <Card key={card.id} color={transparentizedColor}>
+              {card.text}
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

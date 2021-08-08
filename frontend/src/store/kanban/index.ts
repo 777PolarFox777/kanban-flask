@@ -1,6 +1,8 @@
 import { createModel } from '@rematch/core';
 import type { RootModel } from '@store/models';
 import { RootState } from '@store';
+import { request } from '@utils/request';
+import { ApiUrls } from '@constants';
 
 export interface Column {
   id: number,
@@ -25,7 +27,13 @@ export const kanban = createModel<RootModel>()({
   },
   effects: (dispatch) => ({
     async fetchData() {
-      dispatch.kanban.setData([]);
+      try {
+        const { data } = await request.get(ApiUrls.ColumnList);
+
+        dispatch.kanban.setData(data.data);
+      } catch (err) {
+        // TODO: add error handling
+      }
     },
   }),
 });
