@@ -1,17 +1,17 @@
 import * as React from 'react';
-import cn from 'classnames';
 import { Card } from '@components/Card';
-import mockCards from '../../mocks/cards.json';
+import { CardData } from '@store/kanban';
 
 import './Column.css';
 
 export interface ColumnProps {
   color?: string,
   title?: string,
+  cards: CardData[],
 }
 
 export const Column = (props: ColumnProps) => {
-  const { color: backgroundColor, title } = props;
+  const { color: backgroundColor, title, cards } = props;
 
   // use #rrggbbaa hex format
   const transparentizedColor = `${backgroundColor}64`;
@@ -23,7 +23,7 @@ export const Column = (props: ColumnProps) => {
       </div>
       <div style={{ backgroundColor: transparentizedColor }} className="h-full column-content p-md">
         <div className="flex flex-wrap gap-md items-start">
-          {mockCards.map((card) => (
+          {cards.map((card) => (
             <Card key={card.id} color={transparentizedColor}>
               {card.text}
             </Card>
