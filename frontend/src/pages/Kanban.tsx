@@ -3,6 +3,7 @@ import { Column } from '@components/Column';
 import { useDispatch } from '@store/dispatch';
 import { useSelector } from 'react-redux';
 import { getKanban } from '@store/kanban';
+import { sortBy } from 'lodash';
 
 export const Kanban = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ export const Kanban = () => {
 
   return (
     <main className="pt-xxl px-xxl flex space-x-xsm flex-grow">
-      {columns.map((column) => (
+      {sortBy(columns, ['order']).map((column) => (
         <Column key={column.id} {...column} />
       ))}
     </main>
