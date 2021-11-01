@@ -51,7 +51,7 @@ def card_create():
             db.session.add(card)
             db.session.commit()
 
-            return {"message": f"Created Card with id {card.id}"}
+            return {"message": f"Created Card with id {card.id}", "data": card}
         else:
             return {"error": {"message": "Invalid json!"}}, exceptions.BadRequest.code
     except Exception as e:

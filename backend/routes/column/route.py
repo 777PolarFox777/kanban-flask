@@ -50,7 +50,7 @@ def column_create():
             db.session.add(column)
             db.session.commit()
 
-            return {"message": f"Created Column with id {column.id}"}
+            return {"message": f"Created Column with id {column.id}", "data": column}
         else:
             return {"error": {"message": "Invalid json!"}}, exceptions.BadRequest.code
     except Exception as e:
