@@ -1,0 +1,3 @@
+.trash-bin {
+    transition: height .5s, margin .5s, opacity .5s;
+}

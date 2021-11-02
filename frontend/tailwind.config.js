@@ -15,6 +15,9 @@ module.exports = {
       xl: '3rem',
       xxl: '4rem',
     },
+    cursor: {
+      grab: 'grab',
+    },
   },
   variants: {
     extend: {},

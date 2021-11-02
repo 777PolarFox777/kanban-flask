@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { CardData } from '@store/kanban';
+import { useDrag } from 'react-dnd';
+import { DraggableTypes } from '@constants';
 
 import './Card.css';
 
@@ -15,12 +17,21 @@ export interface DragCardItem {
 
 export const Card = (props: CardProps) => {
   const {
-    children, color: backgroundColor,
+    id, children, color: backgroundColor,
   } = props;
 
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: DraggableTypes.Card,
+    item: { id },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+      handlerId: monitor.getHandlerId(),
+    }),
+  }));
+
   return (
-    <div className="card p-md shadow-lg" style={{ backgroundColor }}>
-      <span className="card-content">
+    <div ref={drag} className="card cursor-grab p-md shadow-lg" style={{ backgroundColor, opacity: isDragging ? 0.5 : 1 }}>
+      <span className="card-content" contentEditable onInput={(ev) => console.debug('ev', ev)}>
         {children}
       </span>
     </div>

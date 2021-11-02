@@ -4,6 +4,7 @@ import { useDispatch } from '@store/dispatch';
 import { useSelector } from 'react-redux';
 import { getKanban } from '@store/kanban';
 import { sortBy } from 'lodash';
+import { TrashBin } from '@components/TrashBin';
 
 export const Kanban = () => {
   const dispatch = useDispatch();
@@ -14,10 +15,13 @@ export const Kanban = () => {
   }, []);
 
   return (
-    <main className="pt-xxl px-xxl flex space-x-xsm flex-grow">
-      {sortBy(columns, ['order']).map((column) => (
-        <Column key={column.id} {...column} />
-      ))}
+    <main className="pt-xxl px-xxl">
+      <TrashBin />
+      <div className="flex space-x-xsm flex-grow">
+        {sortBy(columns, ['order']).map((column) => (
+          <Column key={column.id} {...column} />
+        ))}
+      </div>
     </main>
   );
 };

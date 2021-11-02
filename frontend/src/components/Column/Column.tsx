@@ -6,9 +6,7 @@ import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Fab } from '@components/Fab';
 import { Button } from '@components/Button';
 import { useDispatch } from '@store/dispatch';
-import {
-  DropTargetMonitor, useDrag, useDrop, XYCoord,
-} from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 import { DraggableTypes } from '@constants';
 import { useRef } from 'react';
 import { DragCardItem } from '@components/Card/Card';
@@ -25,13 +23,13 @@ export const Column = (props: ColumnData) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ handlerId }, drop] = useDrop({
-    accept: DraggableTypes.Card,
+    accept: DraggableTypes.Column,
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
       };
     },
-    hover(item: DragCardItem, monitor: DropTargetMonitor) {
+    hover(item: DragCardItem) {
       if (!ref.current) {
         return;
       }
@@ -40,35 +38,6 @@ export const Column = (props: ColumnData) => {
 
       // Don't replace items with themselves
       if (dragOrder === hoverOrder) {
-        return;
-      }
-
-      // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
-
-      // Get horizontal middle
-      const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
-
-      // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
-
-      // TODO: figure out the math
-      // Get pixels to the left
-      const hoverClientX = (
-        (clientOffset as XYCoord).x + hoverBoundingRect.width)
-          - hoverBoundingRect.right;
-
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
-
-      // Dragging to the left
-      if (dragOrder < hoverOrder && hoverClientX < hoverMiddleX) {
-        return;
-      }
-
-      // Dragging to the right
-      if (dragOrder > hoverOrder && hoverClientX > hoverMiddleX) {
         return;
       }
 
@@ -84,7 +53,7 @@ export const Column = (props: ColumnData) => {
   });
 
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
-    type: DraggableTypes.Card,
+    type: DraggableTypes.Column,
     item: { id, order },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
@@ -105,7 +74,7 @@ export const Column = (props: ColumnData) => {
 
   return (
     <div ref={dragPreview} className="w-full" style={{ opacity: isDragging ? 0.5 : 1 }} data-handler-id={handlerId}>
-      <div ref={ref} style={{ backgroundColor }} className="flex flex-row p-md mb-xsm text-white text-2xl items-center font-semibold">
+      <div ref={ref} style={{ backgroundColor }} className="cursor-grab flex flex-row p-md mb-xsm text-white text-2xl items-center font-semibold">
         {title}
         <Fab className="ml-auto hover:bg-[#ffffff48]">
           <FontAwesomeIcon icon={faTimes} />

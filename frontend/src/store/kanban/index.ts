@@ -54,11 +54,11 @@ export const kanban = createModel<RootModel>()({
             return column;
           }
 
-          if (orderDirection > 0 && column.order >= newOrder) {
+          if (orderDirection > 0 && column.order >= newOrder && column.order <= order) {
             return { ...column, order: column.order + 1 };
           }
 
-          if (orderDirection < 0 && column.order <= newOrder) {
+          if (orderDirection < 0 && column.order <= newOrder && column.order >= order) {
             return { ...column, order: column.order - 1 };
           }
 
@@ -119,6 +119,21 @@ export const kanban = createModel<RootModel>()({
         dispatch.kanban.addCard(data.data);
       } catch {
         // TODO: add error handling
+      }
+    },
+    async removeCard(id: number, rootState) {
+      const data = [...rootState.kanban.data];
+      try {
+        await request.delete(`${ApiUrls.Card}/${id}`);
+
+        const newData = data.map((column) => ({
+          ...column,
+          cards: column.cards.filter((card) => card.id !== id),
+        }));
+        dispatch.kanban.setData(newData);
+      } catch {
+        // TODO: add error notification
+        dispatch.kanban.setData(data);
       }
     },
   }),
