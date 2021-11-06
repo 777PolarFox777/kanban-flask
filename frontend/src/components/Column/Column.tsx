@@ -11,7 +11,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { DraggableTypes } from '@constants';
 import { DragCardItem } from '@components/Card/Card';
 import { useSelector } from 'react-redux';
-import { debounce } from 'lodash';
+import { debounce, sortBy } from 'lodash';
 
 import './Column.css';
 
@@ -126,7 +126,7 @@ export const Column = (props: ColumnData) => {
           <FontAwesomeIcon icon={faPlus} className="ml-sm" />
         </Button>
         <div className="flex flex-wrap gap-md items-start">
-          {cards.map((card) => (
+          {sortBy(cards, ['order']).map((card) => (
             <Card key={card.id} color={transparentizedColor} {...card}>
               {card.text}
             </Card>

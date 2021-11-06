@@ -3,7 +3,7 @@ import { CardData } from '@store/kanban';
 import { useDrag } from 'react-dnd';
 import { DraggableTypes } from '@constants';
 import { useDispatch } from '@store/dispatch';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import './Card.css';
 
@@ -25,6 +25,8 @@ export const Card = (props: CardProps) => {
 
   const dispatch = useDispatch();
 
+  const [isEditing, setIsEditing] = useState(false);
+
   const syncCard = useCallback((ev: React.FocusEvent<HTMLSpanElement>) => {
     dispatch.kanban.updateCard({ id, text: ev.target.textContent ?? '' });
     dispatch.kanban.syncCards({ ids: [id], fields: ['text'] });
@@ -44,8 +46,10 @@ export const Card = (props: CardProps) => {
     <div ref={drag} className="card cursor-grab p-md shadow-lg" style={{ backgroundColor, opacity: isDragging ? 0.5 : 1 }}>
       <span
         className="card-content"
-        contentEditable
         onBlur={syncCard}
+        onMouseDown={() => setIsEditing(!isEditing)}
+        contentEditable={isEditing}
+        suppressContentEditableWarning
       >
         {children}
       </span>
