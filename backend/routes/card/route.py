@@ -1,15 +1,22 @@
 from flask import request
-from sqlalchemy.exc import NoResultFound
+from iteration_utilities import flatten
 from werkzeug import exceptions
 
 from backend.app import app, db
-from backend.models import Card
+from backend.models import Card, Column
 
 
 @app.route("/card/list", methods=["GET"])
 def card_list():
-    column_id = request.args.get("columnId")
-    cards = Card.query.filter_by(column_id=column_id).order_by(Card.order.asc()).all()
+    user_id = request.cookies.get("userId")
+
+    if user_id is None:
+        return {"error": {"message": "Unable to find user cookie!"}}, exceptions.BadRequest.code
+
+    columns = Column.query.filter_by(user_id=user_id).order_by(Column.order.asc()).all()
+    cards = list(flatten(
+        [Card.query.filter_by(column_id=column.id).order_by(Card.order.asc()).all() for column in columns]
+    ))
 
     return {"data": cards}
 

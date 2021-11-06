@@ -8,6 +8,10 @@ from backend.models import Column
 @app.route("/column/list", methods=["GET"])
 def column_list():
     user_id = request.cookies.get("userId")
+
+    if user_id is None:
+        return {"error": {"message": "Unable to find user cookie!"}}, exceptions.BadRequest.code
+
     columns = Column.query.filter_by(user_id=user_id).order_by(Column.order.asc()).all()
 
     return {"data": columns}
