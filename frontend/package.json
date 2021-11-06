@@ -7,7 +7,8 @@
     "start": "cross-env NODE_ENV=development webpack serve",
     "build": "cross-env NODE_ENV=production webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "tsc": "tsc --noEmit"
   },
   "author": "",
   "license": "MIT",

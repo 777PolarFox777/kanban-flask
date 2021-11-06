@@ -1,6 +1,7 @@
 from flask import request
 from iteration_utilities import flatten
 from werkzeug import exceptions
+import humps
 
 from backend.app import app, db
 from backend.models import Card, Column
@@ -32,7 +33,7 @@ def card_get(card_id):
 def card_update(card_id):
     if request.is_json:
         data = request.get_json()
-        affected_rows = Card.query.filter_by(id=card_id).update(data)
+        affected_rows = Card.query.filter_by(id=card_id).update(humps.decamelize(data))
 
         if affected_rows == 0:
             return {"error": {"message": f"Unable to find Card with id {card_id}"}}, exceptions.NotFound.code

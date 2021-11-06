@@ -2,6 +2,8 @@ import * as React from 'react';
 import { CardData } from '@store/kanban';
 import { useDrag } from 'react-dnd';
 import { DraggableTypes } from '@constants';
+import { useDispatch } from '@store/dispatch';
+import { useCallback } from 'react';
 
 import './Card.css';
 
@@ -12,6 +14,7 @@ export interface CardProps extends CardData {
 
 export interface DragCardItem {
   id: number,
+  columnId: number,
   order: number,
 }
 
@@ -20,6 +23,13 @@ export const Card = (props: CardProps) => {
     id, children, color: backgroundColor,
   } = props;
 
+  const dispatch = useDispatch();
+
+  const syncCard = useCallback((ev: React.FocusEvent<HTMLSpanElement>) => {
+    dispatch.kanban.updateCard({ id, text: ev.target.textContent ?? '' });
+    dispatch.kanban.syncCards({ ids: [id], fields: ['text'] });
+  }, []);
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: DraggableTypes.Card,
     item: { id },
@@ -27,11 +37,16 @@ export const Card = (props: CardProps) => {
       isDragging: monitor.isDragging(),
       handlerId: monitor.getHandlerId(),
     }),
+    isDragging: (monitor) => id === monitor.getItem().id,
   }));
 
   return (
     <div ref={drag} className="card cursor-grab p-md shadow-lg" style={{ backgroundColor, opacity: isDragging ? 0.5 : 1 }}>
-      <span className="card-content" contentEditable onInput={(ev) => console.debug('ev', ev)}>
+      <span
+        className="card-content"
+        contentEditable
+        onBlur={syncCard}
+      >
         {children}
       </span>
     </div>

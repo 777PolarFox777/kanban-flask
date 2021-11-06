@@ -2,13 +2,13 @@ import * as React from 'react';
 import { Column } from '@components/Column';
 import { useDispatch } from '@store/dispatch';
 import { useSelector } from 'react-redux';
-import { getKanban } from '@store/kanban';
+import { getColumns } from '@store/kanban';
 import { sortBy } from 'lodash';
 import { TrashBin } from '@components/TrashBin';
 
 export const Kanban = () => {
   const dispatch = useDispatch();
-  const columns = useSelector(getKanban);
+  const columns = useSelector(getColumns);
 
   React.useEffect((): void => {
     dispatch.kanban.fetchData();

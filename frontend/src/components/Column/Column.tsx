@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { useMemo, useRef } from 'react';
 import { Card } from '@components/Card';
-import { ColumnData } from '@store/kanban';
+import { ColumnData, getCards } from '@store/kanban';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Fab } from '@components/Fab';
@@ -8,22 +9,32 @@ import { Button } from '@components/Button';
 import { useDispatch } from '@store/dispatch';
 import { useDrag, useDrop } from 'react-dnd';
 import { DraggableTypes } from '@constants';
-import { useRef } from 'react';
 import { DragCardItem } from '@components/Card/Card';
+import { useSelector } from 'react-redux';
+import { debounce } from 'lodash';
 
 import './Column.css';
 
+export interface DragColumnItem {
+  id: number,
+  order: number,
+}
+
 export const Column = (props: ColumnData) => {
   const {
-    id, order, color: backgroundColor, title, cards,
+    id, order, color: backgroundColor, title,
   } = props;
 
   const dispatch = useDispatch();
 
+  const cards = useSelector(getCards(id));
+
   const ref = useRef<HTMLDivElement>(null);
 
-  const [{ handlerId }, drop] = useDrop({
-    accept: DraggableTypes.Column,
+  const syncCards = useMemo(() => debounce((cardId) => dispatch.kanban.syncCards({ ids: [cardId], fields: ['columnId'] }), 2_000), []);
+
+  const [{ handlerId: cardHandlerId }, dropCard] = useDrop({
+    accept: DraggableTypes.Card,
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
@@ -33,11 +44,40 @@ export const Column = (props: ColumnData) => {
       if (!ref.current) {
         return;
       }
-      const dragOrder = item.order;
-      const hoverOrder = order;
+      const dragColumnId = item.columnId;
+      const hoverColumnId = id;
 
       // Don't replace items with themselves
-      if (dragOrder === hoverOrder) {
+      if (dragColumnId === hoverColumnId) {
+        return;
+      }
+
+      // Time to actually perform the action
+      dispatch.kanban.updateCard({ id: item.id, columnId: hoverColumnId });
+      syncCards(item.id);
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.columnId = hoverColumnId;
+    },
+  });
+
+  const [{ handlerId }, drop] = useDrop({
+    accept: DraggableTypes.Column,
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      };
+    },
+    hover(item: DragColumnItem) {
+      if (!ref.current) {
+        return;
+      }
+      const dragOrder = item.order;
+      // Don't replace items with themselves
+      if (dragOrder === order) {
         return;
       }
 
@@ -48,7 +88,7 @@ export const Column = (props: ColumnData) => {
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.order = hoverOrder;
+      item.order = order;
     },
   });
 
@@ -80,7 +120,7 @@ export const Column = (props: ColumnData) => {
           <FontAwesomeIcon icon={faTimes} />
         </Fab>
       </div>
-      <div style={{ backgroundColor: transparentizedColor }} className="h-full column-content p-md">
+      <div ref={dropCard} style={{ backgroundColor: transparentizedColor }} className="h-full column-content p-md" data-handler-id={cardHandlerId}>
         <Button onClick={handleCardCreate} className="bg-[#ffffff64] w-full justify-center mb-md hover:bg-[#ffffffb0]">
           Add new card
           <FontAwesomeIcon icon={faPlus} className="ml-sm" />
