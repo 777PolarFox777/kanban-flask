@@ -2,9 +2,9 @@ import { createModel } from '@rematch/core';
 import type { RootModel } from '@store/models';
 import { request } from '@utils/request';
 import { ApiUrls } from '@constants';
-import { pick } from 'lodash';
-import { RootState } from '@store';
-import { ApiResponse } from '../../commonTypes';
+import { pick, sortBy } from 'lodash';
+import type { RootState } from '@store';
+import type { ApiResponse } from '../../commonTypes';
 
 export interface CardData {
   id: number,
@@ -52,39 +52,13 @@ export const kanban = createModel<RootModel>()({
       return { ...state, cards: newData };
     },
     updateColumn(state, payload: Partial<ColumnData>) {
-      const { order: newOrder } = payload;
-      let order = -1;
       const newData = state.columns.map((column) => {
         if (column.id === payload.id) {
-          order = column.order;
           return { ...column, ...payload };
         }
 
         return column;
       });
-
-      // recalculate order
-      if (newOrder && order > 0) {
-        const orderDirection = Math.sign(order - newOrder);
-
-        const sortedData = newData.map((column) => {
-          if (column.id === payload.id || orderDirection === 0) {
-            return column;
-          }
-
-          if (orderDirection > 0 && column.order >= newOrder && column.order <= order) {
-            return { ...column, order: column.order + 1 };
-          }
-
-          if (orderDirection < 0 && column.order <= newOrder && column.order >= order) {
-            return { ...column, order: column.order - 1 };
-          }
-
-          return column;
-        });
-
-        return { ...state, columns: sortedData };
-      }
 
       return { ...state, columns: newData };
     },
@@ -158,3 +132,27 @@ export const getColumns = (state: RootState) => state.kanban.columns;
 export const getCards = (columnId: number) => (state: RootState) => state.kanban.cards.filter(
   (card) => card.columnId === columnId,
 );
+
+export const getSiblingCard = (position: 'next' | 'prev', fromId: number, toId: number) => (state: RootState): CardData | undefined => {
+  const currentCard = state.kanban.cards.find((card) => card.id === toId);
+  const sortedCards = sortBy(state.kanban.cards.filter((card) => card.id !== fromId && card.columnId === currentCard?.columnId), ['order']);
+  const currentCardPosition = sortedCards.findIndex((card) => card.id === toId);
+
+  if (currentCardPosition === -1) {
+    throw new Error(`Card with id: ${toId} is not present in cards list.`);
+  }
+
+  if (position === 'next') {
+    return sortedCards[currentCardPosition + 1];
+  }
+
+  return sortedCards[currentCardPosition - 1];
+};
+
+export const getSiblingCards = (
+  fromId: number,
+  toId: number,
+) => (state: RootState): [CardData | undefined, CardData | undefined] => [
+  getSiblingCard('prev', fromId, toId)(state),
+  getSiblingCard('next', fromId, toId)(state),
+];

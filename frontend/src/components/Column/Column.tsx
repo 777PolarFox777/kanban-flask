@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useMemo, useRef } from 'react';
 import { Card } from '@components/Card';
-import { ColumnData, getCards } from '@store/kanban';
+import type { ColumnData } from '@store/kanban';
+import { getCards } from '@store/kanban';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Fab } from '@components/Fab';
@@ -9,7 +10,7 @@ import { Button } from '@components/Button';
 import { useDispatch } from '@store/dispatch';
 import { useDrag, useDrop } from 'react-dnd';
 import { DraggableTypes } from '@constants';
-import { DragCardItem } from '@components/Card/Card';
+import type { DragCardItem } from '@components/Card/Card';
 import { useSelector } from 'react-redux';
 import { debounce, sortBy } from 'lodash';
 
@@ -31,7 +32,7 @@ export const Column = (props: ColumnData) => {
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const syncCards = useMemo(() => debounce((cardId) => dispatch.kanban.syncCards({ ids: [cardId], fields: ['columnId'] }), 2_000), []);
+  const syncCards = useMemo(() => debounce((cardId) => dispatch.kanban.syncCards({ ids: [cardId], fields: ['columnId', 'order'] }), 2_000), []);
 
   const [{ handlerId: cardHandlerId }, dropCard] = useDrop({
     accept: DraggableTypes.Card,
@@ -52,8 +53,9 @@ export const Column = (props: ColumnData) => {
         return;
       }
 
+      const newOrder = cards.length ? Math.max(...cards.map((card) => card.order)) + 1 : 100;
       // Time to actually perform the action
-      dispatch.kanban.updateCard({ id: item.id, columnId: hoverColumnId });
+      dispatch.kanban.updateCard({ id: item.id, columnId: hoverColumnId, order: newOrder });
       syncCards(item.id);
 
       // Note: we're mutating the monitor item here!
@@ -61,6 +63,7 @@ export const Column = (props: ColumnData) => {
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.columnId = hoverColumnId;
+      item.order = newOrder;
     },
   });
 
@@ -108,7 +111,7 @@ export const Column = (props: ColumnData) => {
 
   const handleCardCreate = () => dispatch.kanban.createCard({
     text: 'New card',
-    order: 1,
+    order: cards.length ? Math.max(...cards.map((card) => card.order)) + 1 : 100,
     columnId: id,
   });
 
