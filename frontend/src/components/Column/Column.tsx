@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo, useRef } from 'react';
 import { Card } from '@components/Card';
 import type { ColumnData } from '@store/kanban';
-import { getCards } from '@store/kanban';
+import { getCards, getSiblingColumns } from '@store/kanban';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Fab } from '@components/Fab';
@@ -13,6 +13,9 @@ import { DraggableTypes } from '@constants';
 import type { DragCardItem } from '@components/Card/Card';
 import { useSelector } from 'react-redux';
 import { debounce, sortBy } from 'lodash';
+import { onDragHover } from '@utils/onDragHover';
+import { store } from '@store';
+import { getItemOrder } from '@utils/getItemOrder';
 
 import './Column.css';
 
@@ -30,7 +33,8 @@ export const Column = (props: ColumnData) => {
 
   const cards = useSelector(getCards(id));
 
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const syncCards = useMemo(() => debounce((cardId) => dispatch.kanban.syncCards({ ids: [cardId], fields: ['columnId', 'order'] }), 2_000), []);
 
@@ -74,25 +78,20 @@ export const Column = (props: ColumnData) => {
         handlerId: monitor.getHandlerId(),
       };
     },
-    hover(item: DragColumnItem) {
-      if (!ref.current) {
-        return;
-      }
-      const dragOrder = item.order;
-      // Don't replace items with themselves
-      if (dragOrder === order) {
-        return;
-      }
+    hover: onDragHover<DragColumnItem>(wrapperRef, (item) => {
+      const [prevCol, nextCol] = getSiblingColumns(id)(store.getState());
 
+      const direction = item.order > order ? 'left' : 'right';
+      const newOrder = getItemOrder(...(direction === 'left' ? [prevCol?.order, order] : [order, nextCol?.order]));
       // Time to actually perform the action
-      dispatch.kanban.updateColumn({ id: item.id, order });
+      dispatch.kanban.updateColumn({ id: item.id, order: newOrder });
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.order = order;
-    },
+      item.order = newOrder;
+    }),
   });
 
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
@@ -105,6 +104,7 @@ export const Column = (props: ColumnData) => {
   }));
 
   drag(drop(ref));
+  dragPreview(wrapperRef);
 
   // use #rrggbbaa hex format
   const transparentizedColor = `${backgroundColor}64`;
@@ -116,7 +116,7 @@ export const Column = (props: ColumnData) => {
   });
 
   return (
-    <div ref={dragPreview} className="w-full" style={{ opacity: isDragging ? 0.5 : 1 }} data-handler-id={handlerId}>
+    <div ref={wrapperRef} className="w-full" data-id={id} style={{ opacity: isDragging ? 0.5 : 1 }} data-handler-id={handlerId}>
       <div ref={ref} style={{ backgroundColor }} className="cursor-grab flex flex-row p-md mb-xsm text-white text-2xl items-center font-semibold">
         {title}
         <Fab className="ml-auto hover:bg-[#ffffff48]">

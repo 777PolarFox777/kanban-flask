@@ -133,26 +133,44 @@ export const getCards = (columnId: number) => (state: RootState) => state.kanban
   (card) => card.columnId === columnId,
 );
 
-export const getSiblingCard = (position: 'next' | 'prev', fromId: number, toId: number) => (state: RootState): CardData | undefined => {
-  const currentCard = state.kanban.cards.find((card) => card.id === toId);
-  const sortedCards = sortBy(state.kanban.cards.filter((card) => card.id !== fromId && card.columnId === currentCard?.columnId), ['order']);
-  const currentCardPosition = sortedCards.findIndex((card) => card.id === toId);
+export interface GetSiblingOptions {
+  position: 'next' | 'prev', fromId: number, toId: number
+  items: any,
+}
 
-  if (currentCardPosition === -1) {
-    throw new Error(`Card with id: ${toId} is not present in cards list.`);
+export const getSibling = <T extends { id: number }>(position: 'next' | 'prev', id: number, items: T[]): T | undefined => {
+  const sortedItems = sortBy(items, ['order']);
+  const currentItemPosition = sortedItems.findIndex((item) => item.id === id);
+
+  if (currentItemPosition === -1) {
+    throw new Error(`Item with id: ${id} is not present in cards list.`);
   }
 
   if (position === 'next') {
-    return sortedCards[currentCardPosition + 1];
+    return sortedItems[currentItemPosition + 1];
   }
 
-  return sortedCards[currentCardPosition - 1];
+  return sortedItems[currentItemPosition - 1];
 };
 
 export const getSiblingCards = (
   fromId: number,
   toId: number,
-) => (state: RootState): [CardData | undefined, CardData | undefined] => [
-  getSiblingCard('prev', fromId, toId)(state),
-  getSiblingCard('next', fromId, toId)(state),
+) => (state: RootState): [CardData | undefined, CardData | undefined] => {
+  const currentItem = state.kanban.cards.find((item) => item.id === toId);
+  const items = state.kanban.cards.filter(
+    (card) => card.id !== fromId && card.columnId === currentItem?.columnId,
+  );
+
+  return [
+    getSibling('prev', toId, items),
+    getSibling('next', toId, items),
+  ];
+};
+
+export const getSiblingColumns = (
+  id: number,
+) => (state: RootState): [ColumnData | undefined, ColumnData | undefined] => [
+  getSibling('prev', id, state.kanban.columns),
+  getSibling('next', id, state.kanban.columns),
 ];
